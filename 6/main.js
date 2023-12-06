@@ -28,4 +28,14 @@ function zip(a, b, map) {
     }
     return result;
 }
+// How to not brute force it:
+// 1. way one: binary search the upper and lower bounds, then take the difference
+// 2. way two: use some algebra to find the intersections between the record distance and the distance parabola, ceiling both, and subtract
+// let t be the total time for the race and b be the time pressing the button. let r be the record distance, and d be distance. Find the intersections between d = r and d = b * (t - b), solving for b.
+// r = b * (t - b) -> r = -b^2 + tb -> r = -b^2 + tb + (t^2)/4 - (t^2)/4
+// -r = b^2 - tb + (t^2)/4 - (t^2)/4 -> -r = (b - t/2)^2 - (t^2)/4 -> +-sqrt((t^2)/4 - r) = b - t/2
+// b = t/2 +- sqrt((t^2)/4 - r)
+const lowerBound = Math.ceil((time / 2) - Math.sqrt(((time * time) / 4) - distance));
+const upperBound = Math.ceil((time / 2) + Math.sqrt(((time * time) / 4) - distance));
+console.log(upperBound - lowerBound);
 //# sourceMappingURL=main.js.map
