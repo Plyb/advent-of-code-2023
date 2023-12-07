@@ -14,7 +14,7 @@ type handBid = {
 }
 const strengths = {
     'T': 10,
-    'J': 11,
+    'J': 1,
     'Q': 12,
     'K': 13,
     'A': 14,
@@ -68,21 +68,31 @@ function handType(cards: handCards) {
 
         valueToCounts[card]++;
     }
+    const numJokers = valueToCounts[1] ?? 0;
+    delete valueToCounts[1];
     const counts = Object.values(valueToCounts).sort((a, b) => b - a);
 
-    if (counts[0] === 5) {
+    if (getCount(0) + numJokers === 5) {
         return 6; // five of a kind
-    } else if (counts[0] === 4) {
+    } else if (getCount(0) + numJokers === 4) {
         return 5; // four of a kind
-    } else if (counts[0] === 3 && counts[1] === 2) {
+    } else if ((getCount(0) + numJokers === 3 && getCount(1) === 2) // <--- I hate this
+        || (getCount(0) === 3 && getCount(1) + numJokers === 2)
+        || (numJokers === 2
+            && (getCount(0) + 1 === 3 && getCount(1) + 1 === 2))
+    ) {
         return 4; // full house
-    } else if (counts[0] === 3) {
+    } else if (getCount(0) + numJokers === 3) {
         return 3; // three of a kind
-    } else if (counts[0] === 2 && counts[1] === 2) {
+    } else if (getCount(0) === 2 && getCount(1) + numJokers === 2) {
         return 2; // two pair
-    } else if (counts[0] === 2) {
+    } else if (getCount(0) + numJokers === 2) {
         return 1; // one pair
     } else {
         return 0; // high card
+    }
+
+    function getCount(i: number) {
+        return counts[i] ?? 0;
     }
 }
