@@ -12,18 +12,18 @@ const inputSequences: sequence[] = inputLines.map(inputLine => {
 
 const differentiatedSequences = inputSequences.map(getDifferentiatedSequence);
 
-const predictedSequences = differentiatedSequences.map(predictNext);
+const predictedSequences = differentiatedSequences.map(predictPrev);
 
-const result = predictedSequences.reduce((acc, curr) => acc + curr[0][curr[0].length - 1], 0);
+const result = predictedSequences.reduce((acc, curr) => acc + curr[0][0], 0);
 console.log(result);
 
-function predictNext(sequence: sequence) {
-    sequence[sequence.length - 1].push(0);
+function predictPrev(sequence: sequence) {
+    sequence[sequence.length - 1].unshift(0);
 
     for (let i = sequence.length - 2; i >= 0; i--) {
         const differentiationLevel = sequence[i];
         const nextDiffLevel = sequence[i + 1]
-        differentiationLevel.push(differentiationLevel[differentiationLevel.length - 1] + nextDiffLevel[nextDiffLevel.length - 1])
+        differentiationLevel.unshift(differentiationLevel[0] - nextDiffLevel[0])
     }
     return sequence;
 }
