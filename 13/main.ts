@@ -20,7 +20,7 @@ const scores = patterns.map(pattern => {
 });
 
 console.log(scores);
-console.log(scores.reduce((acc, curr) => acc + curr, 0));
+console.log(sum(scores));
 
 function transpose(pattern: pattern) : pattern {
     return new Array(pattern[0].length).fill(null).map((_, i) =>
@@ -32,12 +32,8 @@ function toString(pattern: pattern): string {
     return pattern.map(row => row.join('')).join('\r\n');
 }
 
-function arrayEquals<T>(a: T[], b: T[]) {
-    if (a.length !== b.length) {
-        return false;
-    }
-
-    return a.every((_, i) => a[i] === b[i]);
+function arrayDifference<T>(a: T[], b: T[]) {
+    return a.filter((_, i) => a[i] !== b[i]).length;
 }
 
 function getHorizReflIndex(pattern: pattern) {
@@ -46,13 +42,18 @@ function getHorizReflIndex(pattern: pattern) {
             return false;
         }
 
-        return pattern.slice(0, reflIndex + 1).every((row, i) => {
+        const numDifferent = pattern.slice(0, reflIndex + 1).map((row, i) => {
             const reflectedRow = pattern[reflIndex + 1 + (reflIndex - i)];
             if (reflectedRow === undefined) {
-                return true;
+                return 0;
             }
 
-            return arrayEquals(row, reflectedRow);
-        })
+            return arrayDifference(row, reflectedRow);
+        });
+        return sum(numDifferent) === 1;
     })
+}
+
+function sum(arr: number[]) {
+    return arr.reduce((acc, curr) => acc + curr, 0);
 }
