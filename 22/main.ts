@@ -26,8 +26,6 @@ const bricks: brick[] = inputLines.map((inputLine, i) => {
     };
 }).sort((a, b) => a.min[2] - b.min[2]);
 
-// console.log(bricks.map(brick => brick.min[2]).join(','));
-
 if (!bricks.every(brick => brick.min[0] <= brick.max[0] && brick.min[1] <= brick.max[1] && brick.min[2] <= brick.max[2])) {
     console.log('assert violation: order')
 }
@@ -112,14 +110,25 @@ function getSupportersOf(brick: brick, space: space) {
 // console.log('after');
 // printSpace(space, labelLen);
 
-// check for redundant supporters
+// check for critical supporters
 
-const redundantSupporters = bricks.filter(brick =>
-    brick.supportees.every(supportee => supportee.supporters.length > 1)
-);
+function getChainReactionCollapsedBlocks(collapsedSoFar: Set<brick>, newlyCollapsed: brick[]) {
+    const supporteesOfNewlyCollapsed = newlyCollapsed.flatMap(brick => brick.supportees);
+    const toCollapseNext = supporteesOfNewlyCollapsed.filter(supportee =>
+        supportee.supporters.every(supporter => collapsedSoFar.has(supporter))
+    );
+    if (toCollapseNext.length === 0) {
+        return collapsedSoFar;
+    } else {
+        return getChainReactionCollapsedBlocks(new Set([...collapsedSoFar, ...toCollapseNext]), toCollapseNext);
+    }
+}
 
-console.log('disintigratable:', redundantSupporters.length);
-// console.log(redundantSupporters.map(brick => brick.label.toString()).join(','))
+const totalFallingBricks = sum(bricks.map((brick, i) =>
+    getChainReactionCollapsedBlocks(new Set([brick]), [brick]).size - 1
+));
+
+console.log('total falling bricks:', totalFallingBricks);
 
 function printSpace(space: space, labelLen: number) {
     for (let x = 0; x < space.length; x++) {
@@ -139,4 +148,8 @@ function transpose<T>(pattern: T[][]) : T[][] {
     return new Array(pattern[0].length).fill(null).map((_, i) =>
         pattern.map((_, j) => pattern[j][i])
     )
+}
+
+function sum(arr: number[]) {
+    return arr.reduce((acc, curr) => acc + curr, 0);
 }
