@@ -12,7 +12,8 @@ type grid = cell[][];
 function main(filePath: fs.PathOrFileDescriptor) {
     const input = fs.readFileSync(filePath, 'utf-8');
 
-    const grid: grid = input.split('\r\n').map(inputLine => inputLine.split('') as cell[]);
+    const grid: grid = input.split('\r\n').map(inputLine => inputLine.split('')
+        .map(cell => (cell === '>' || cell === 'v') ? '.' : cell) as cell[]);
     
     type loc = [number, number];
     type node = {
@@ -107,11 +108,18 @@ function main(filePath: fs.PathOrFileDescriptor) {
                         }
     
                         const succ = getFromKey(nodeGrid, succKey);
+
+                        const newWeight = predWeight + succWeight;
             
-                        pred.succs.set(succKey, predWeight + succWeight);
+                        if ((pred.succs.get(succKey) ?? 0) < newWeight) {
+                            pred.succs.set(succKey, newWeight);
+                        }
                         pred.succs.delete(nodeKey);
                         pred.preds.delete(nodeKey);
-                        succ.preds.set(predKey, predWeight + succWeight);
+
+                        if ((succ.preds.get(predKey) ?? 0) < newWeight) {
+                            succ.preds.set(predKey, newWeight);
+                        }
                         succ.preds.delete(nodeKey);
                         succ.succs.delete(nodeKey);
                     }
