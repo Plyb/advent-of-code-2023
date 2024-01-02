@@ -6,6 +6,8 @@
   "version": "1.0.0",
   "main": "main.ts",
   "dependencies": {
+    "decimal": "^0.0.2",
+    "decimal.js": "^10.4.3",
     "undici-types": "^5.26.5"
   },
   "scripts": {
